@@ -7,7 +7,6 @@ from django.utils.http import urlencode
 from . import models
 
 
-
 class InventoryFilter(admin.SimpleListFilter):
     title = 'inventory'
     parameter_name = 'inventory'
@@ -27,7 +26,6 @@ class InventoryFilter(admin.SimpleListFilter):
         return queryset.filter(inventory__gte=10)
 
 
-
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     actions = ['clear_inventory']
@@ -36,7 +34,6 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ['title']
     }
-
 
     list_display = ['title', 'inventory_status',
                     'unit_price', 'collection_title']
@@ -62,6 +59,7 @@ class ProductAdmin(admin.ModelAdmin):
         updated_count = queryset.update(inventory=0)
         self.message_user(
             request, f'{updated_count} products were successfully updated')
+
 
 class OrderItemInline(admin.TabularInline):
     model = models.OrderItem

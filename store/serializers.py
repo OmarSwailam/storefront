@@ -4,8 +4,7 @@ from .models import Product, Collection, Review, Cart, CartItem
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    taxed_price = serializers.SerializerMethodField(
-        method_name='calculate_tax')
+    taxed_price = serializers.SerializerMethodField(method_name="calculate_tax")
 
     # collection = serializers.HyperlinkedRelatedField(
     #     queryset=Collection.objects.all(),
@@ -14,8 +13,16 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'slug', 'description',
-                  'inventory', 'unit_price', 'taxed_price', 'collection']
+        fields = [
+            "id",
+            "title",
+            "slug",
+            "description",
+            "inventory",
+            "unit_price",
+            "taxed_price",
+            "collection",
+        ]
 
     def calculate_tax(self, product: Product):
         return product.unit_price * Decimal(1.2)
@@ -26,40 +33,37 @@ class CollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Collection
-        fields = ['id', 'title', 'products_count']
+        fields = ["id", "title", "products_count"]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['id', 'name', 'description', 'date', 'product']
+        fields = ["id", "name", "description", "date", "product"]
 
-        extra_kwargs = {
-            'product': {'read_only': True}
-        }
+        extra_kwargs = {"product": {"read_only": True}}
 
     def create(self, validated_data):
-        product_pk = self.context['product_pk']
+        product_pk = self.context["product_pk"]
         return Review.objects.create(product_id=product_pk, **validated_data)
 
 
 class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'title', 'unit_price']
+        fields = ["id", "title", "unit_price"]
 
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer()
-    total_price = serializers.SerializerMethodField(
-        method_name='get_total_price')
+    total_price = serializers.SerializerMethodField(method_name="get_total_price")
 
     def get_total_price(self, item):
         return item.quantity * item.product.unit_price
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'quantity', 'total_price']
+        fields = ["id", "product", "quantity", "total_price"]
 
 
 class AddCartItemSerializer(serializers.ModelSerializer):
@@ -67,13 +71,14 @@ class AddCartItemSerializer(serializers.ModelSerializer):
 
     def validate_product_id(self, value):
         if not Product.objects.filter(pk=value).exists():
-            raise serializers.ValidationError('Wrong product id')
+            raise serializers.ValidationError("Wrong product id")
         return value
-    def save(self, **kwargs):
-        cart_id = self.context['cart_pk']
 
-        product_id = self.validated_data['product_id']
-        quantity = self.validated_data['quantity']
+    def save(self, **kwargs):
+        cart_id = self.context["cart_pk"]
+
+        product_id = self.validated_data["product_id"]
+        quantity = self.validated_data["quantity"]
 
         try:
             cart_item = CartItem.objects.get(cart_id=cart_id, product_id=product_id)
@@ -87,28 +92,26 @@ class AddCartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product_id', 'quantity']
+        fields = ["id", "product_id", "quantity"]
 
 
 class UpdateCartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
-        fields = ['quantity']
+        fields = ["quantity"]
 
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
-    total_price = serializers.SerializerMethodField(
-        method_name='get_total_price')
+    total_price = serializers.SerializerMethodField(method_name="get_total_price")
 
     def get_total_price(self, cart):
-        return sum([item.product.unit_price * item.quantity for item in cart.items.all()])
-
+        return sum(
+            [item.product.unit_price * item.quantity for item in cart.items.all()]
+        )
 
     class Meta:
         model = Cart
-        fields = ['id', 'items', 'total_price']
+        fields = ["id", "items", "total_price"]
 
-        extra_kwargs = {
-            'id': {'read_only': True}
-        }
+        extra_kwargs = {"id": {"read_only": True}}

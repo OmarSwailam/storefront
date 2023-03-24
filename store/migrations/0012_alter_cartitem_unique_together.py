@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('store', '0011_rename_product_cartitem_product_alter_cart_id_and_more'),
+        ("store", "0011_rename_product_cartitem_product_alter_cart_id_and_more"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='cartitem',
-            unique_together={('cart', 'product')},
+            name="cartitem",
+            unique_together={("cart", "product")},
         ),
     ]

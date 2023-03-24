@@ -8,23 +8,29 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('store', '0010_rename_product_review_product'),
+        ("store", "0010_rename_product_review_product"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='cartitem',
-            old_name='Product',
-            new_name='product',
+            model_name="cartitem",
+            old_name="Product",
+            new_name="product",
         ),
         migrations.AlterField(
-            model_name='cart',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False),
+            model_name="cart",
+            name="id",
+            field=models.UUIDField(
+                default=uuid.uuid4, primary_key=True, serialize=False
+            ),
         ),
         migrations.AlterField(
-            model_name='cartitem',
-            name='cart',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='store.cart'),
+            model_name="cartitem",
+            name="cart",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="items",
+                to="store.cart",
+            ),
         ),
     ]

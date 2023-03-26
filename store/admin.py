@@ -76,8 +76,10 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
+    autocomplete_fields = ["user"]
     list_display = ["first_name", "last_name", "email", "phone", "membership", "orders"]
     list_editable = ["membership"]
+    list_select_related = ["user"]
     list_per_page = 100
     search_fields = [
         "first_name__istartswith",

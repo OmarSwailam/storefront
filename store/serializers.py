@@ -4,7 +4,8 @@ from .models import Product, Collection, Review, Cart, CartItem, Customer
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    taxed_price = serializers.SerializerMethodField(method_name="calculate_tax")
+    taxed_price = serializers.SerializerMethodField(
+        method_name="calculate_tax")
 
     # collection = serializers.HyperlinkedRelatedField(
     #     queryset=Collection.objects.all(),
@@ -56,7 +57,8 @@ class SimpleProductSerializer(serializers.ModelSerializer):
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer()
-    total_price = serializers.SerializerMethodField(method_name="get_total_price")
+    total_price = serializers.SerializerMethodField(
+        method_name="get_total_price")
 
     def get_total_price(self, item):
         return item.quantity * item.product.unit_price
@@ -81,12 +83,14 @@ class AddCartItemSerializer(serializers.ModelSerializer):
         quantity = self.validated_data["quantity"]
 
         try:
-            cart_item = CartItem.objects.get(cart_id=cart_id, product_id=product_id)
+            cart_item = CartItem.objects.get(
+                cart_id=cart_id, product_id=product_id)
             cart_item.quantity += quantity
             cart_item.save()
             self.instance = cart_item
         except CartItem.DoesNotExist:
-            cart_item = CartItem.objects.create(cart_id=cart_id, **self.validated_data)
+            cart_item = CartItem.objects.create(
+                cart_id=cart_id, **self.validated_data)
             self.instance = cart_item
         return self.instance
 
@@ -103,7 +107,8 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
-    total_price = serializers.SerializerMethodField(method_name="get_total_price")
+    total_price = serializers.SerializerMethodField(
+        method_name="get_total_price")
 
     def get_total_price(self, cart):
         return sum(
@@ -118,7 +123,8 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField()
+    user_id = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Customer
         fields = ["id", "user_id", "phone", "birth_date", "membership"]

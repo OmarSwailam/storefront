@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_filters",
+    "corsheaders",
     "rest_framework",
     "djoser",
     "debug_toolbar",
-    "django_filters",
     "playground",
     "store",
     "tags",
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -64,6 +66,10 @@ INTERNAL_IPS = [
     # ...
     "127.0.0.1",
     # ...
+]
+
+CORS_ALLOWED_ORIGINS = [
+
 ]
 
 ROOT_URLCONF = "storefront.urls"
@@ -137,6 +143,9 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -147,7 +156,7 @@ REST_FRAMEWORK = {
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication"
+        "rest_framework.authentication.SessionAuthentication",
     ),
 }
 
@@ -159,7 +168,7 @@ SIMPLE_JWT = {
 DJOSER = {
     "SERIALIZERS": {
         "user_create": "core.serializers.UserCreateSerializer",
-        'current_user': 'core.serializers.UserSerializer',
+        "current_user": "core.serializers.UserSerializer",
     },
 }
 

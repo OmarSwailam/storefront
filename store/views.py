@@ -21,6 +21,7 @@ from .models import (
     CartItem,
     Customer,
     Order,
+    ProductImage,
 )
 from .serializers import (
     ProductSerializer,
@@ -35,6 +36,7 @@ from .serializers import (
     CreateOrderSerializer,
     OrderItemSerializer,
     UpdateOrderSerializer,
+    ProductImageSerializer,
 )
 from .filters import ProductFilter
 from .pagination import DefaultPagination
@@ -45,7 +47,7 @@ from .permissions import (
 
 
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.prefetch_related("images").all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
@@ -185,3 +187,13 @@ class OrderItemViewSet(ModelViewSet):
     def get_queryset(self):
         items = OrderItem.objects.all().prefetch_related("orderitems")
         return items
+
+
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs["product_pk"])
+
+    def get_serializer_context(self):
+        return {"product_id": self.kwargs["product_pk"]}

@@ -11,12 +11,24 @@ from .models import (
     Customer,
     Order,
     OrderItem,
+    ProductImage,
 )
+
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ["id", "image"]
+
+    def create(self, validated_data):
+        return ProductImage.objects.create(
+            product_id=self.context["product_id"], **validated_data
+        )
 
 
 class ProductSerializer(serializers.ModelSerializer):
     taxed_price = serializers.SerializerMethodField(method_name="calculate_tax")
-
+    images = ProductImageSerializer(many=True, read_only=True)
     # collection = serializers.HyperlinkedRelatedField(
     #     queryset=Collection.objects.all(),
     #     view_name='collection-detail'
@@ -33,6 +45,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "unit_price",
             "taxed_price",
             "collection",
+            "images",
         ]
 
     def calculate_tax(self, product: Product):
@@ -172,19 +185,15 @@ class CreateOrderSerializer(serializers.Serializer):
     cart_id = serializers.UUIDField()
 
     def validate_cart_id(self, cart_id):
-        print(cart_id)
         if not Cart.objects.filter(pk=cart_id).exists():
             raise serializers.ValidationError("Wrong cart id")
         if CartItem.objects.filter(cart_id=cart_id).count() == 0:
-            print(CartItem.objects.filter(pk=cart_id).count())
             raise serializers.ValidationError("Empty cart")
         return cart_id
 
     def save(self, **kwargs):
         with transaction.atomic():
-            customer = Customer.objects.get(
-                user_id=self.context["user_id"]
-            )
+            customer = Customer.objects.get(user_id=self.context["user_id"])
             order = Order.objects.create(customer=customer)
             cart_id = self.validated_data["cart_id"]
             cart_items = CartItem.objects.select_related("product").filter(
@@ -211,7 +220,8 @@ class CreateOrderSerializer(serializers.Serializer):
 class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['payment_status']
+        fields = ["payment_status"]
+
 
 class AddOrderItemSerializer(serializers.ModelSerializer):
     product_id = serializers.IntegerField()

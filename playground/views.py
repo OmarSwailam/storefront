@@ -5,6 +5,7 @@ from store.models import Customer, Collection, Product, Order, OrderItem
 from tags.models import TaggedItem
 from django.core.mail import EmailMessage, send_mail, mail_admins, BadHeaderError
 from templated_mail.mail import BaseEmailMessage
+from .tasks import notify_customers
 
 
 def index(request):
@@ -33,21 +34,22 @@ def index(request):
     # )
     # queryset = Product.objects.annotate(discount_price=discount_price)
     # TaggedItem.object.get_tags_for(Product, 1)
-    try:
-        message = BaseEmailMessage(
-            template_name='emails/hello.html',
-            context={
-                'name': 'Omar'
-            }
-        )
-        message.send(['omar@example.com'])
-        # message = EmailMessage(
-        #     "subject", "message", "info@omar.com", ["omarswailam@outlook.com"]
-        # )
-        # message.attach_file("")
-        # message.send()
-        # mail_admins("subject", "message", html_message="message")
-        # send_mail("subject", "message", "info@omar.com", ["omarswailam@outlook.com"])
-    except BadHeaderError:
-        print("bad header error")
+    # try:
+    #     message = BaseEmailMessage(
+    #         template_name='emails/hello.html',
+    #         context={
+    #             'name': 'Omar'
+    #         }
+    #     )
+    #     message.send(['omar@example.com'])
+    #     # message = EmailMessage(
+    #     #     "subject", "message", "info@omar.com", ["omarswailam@outlook.com"]
+    #     # )
+    #     # message.attach_file("")
+    #     # message.send()
+    #     # mail_admins("subject", "message", html_message="message")
+    #     # send_mail("subject", "message", "info@omar.com", ["omarswailam@outlook.com"])
+    # except BadHeaderError:
+    #     print("bad header error")
+    notify_customers.delay('hello there')
     return render(request, "index.html", {"name": "omar"})

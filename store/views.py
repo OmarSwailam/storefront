@@ -1,5 +1,8 @@
 from django.db.models.aggregates import Count
 from django_filters.rest_framework import DjangoFilterBackend
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
@@ -46,6 +49,10 @@ from .permissions import (
 )
 
 
+def get_cache_key(product_id):
+    return f"product_detail_{product_id}"
+
+
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.prefetch_related("images").all()
     serializer_class = ProductSerializer
@@ -55,6 +62,10 @@ class ProductViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     search_fields = ["title", "description"]
     ordering_fields = ["title", "unit_price", "last_updated"]
+
+    # @method_decorator(cache_page(60 * 5))
+    # def list(self, request, *args, **kwargs):
+    #     return super().list(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if OrderItem.objects.filter(product_id=kwargs["pk"]).count() > 0:

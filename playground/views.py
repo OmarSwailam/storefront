@@ -11,14 +11,22 @@ from django.core.mail import EmailMessage, send_mail, mail_admins, BadHeaderErro
 from templated_mail.mail import BaseEmailMessage
 from .tasks import notify_customers
 import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class HelloView(APIView):
     @method_decorator(cache_page(60 * 5))
     def get(self, request):
-        response = requests.get("https://httpbin.org/delay/2")
-        data = response.json()
-        return render(request, "index.html", {"name": data})
+        try:
+            logger.info("http get..")
+            response = requests.get("https://httpbin.org/delay/2")
+            logger.info("Done")
+            data = response.json()
+        except requests.ConnectionError:
+            logger.critical("error")
+        return render(request, "index.html", {"name": "omar"})
 
 
 # def index(request):

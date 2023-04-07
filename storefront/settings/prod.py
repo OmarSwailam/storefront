@@ -1,7 +1,6 @@
 import os
 from .common import *
 import dj_database_url
-import requests
 
 
 DEBUG = False
@@ -26,14 +25,3 @@ CACHES = {
         },
     }
 }
-
-response = requests.get(
-    "https://mailtrap.io/api/v1/inboxes.json?api_token=<MAILTRAP_API_TOKEN>"
-)
-credentials = response.json()[0]
-
-EMAIL_HOST = credentials["domain"]
-EMAIL_HOST_USER = credentials["username"]
-EMAIL_HOST_PASSWORD = credentials["password"]
-EMAIL_PORT = credentials["smtp_ports"][0]
-EMAIL_USE_TLS = True

@@ -22,6 +22,8 @@ INSTALLED_APPS = [
     "djoser",
     "silk",
     "debug_toolbar",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     "playground",
     "store",
     "tags",
@@ -116,6 +118,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -133,7 +136,6 @@ DJOSER = {
 AUTH_USER_MODEL = "core.User"
 
 
-
 ADMINS = [
     ("Omar", "omaradmin@example.com"),
 ]
@@ -147,7 +149,6 @@ CELERY_BEAT_SCHEDULE = {
         "args": ["Hello there"],
     }
 }
-
 
 
 LOGGING = {
@@ -169,4 +170,17 @@ LOGGING = {
             "style": "{",
         }
     },
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "E-commerce API",
+    "DESCRIPTION": "",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
+SPECTACULAR_SETTINGS = {
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
 }

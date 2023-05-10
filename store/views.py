@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.db.models.aggregates import Count
+from django.shortcuts import redirect
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
@@ -47,6 +49,7 @@ from .permissions import (
     IsAdminOrReadOnly,
     ViewCustomerHistoryPermission,
 )
+import stripe
 
 
 def get_cache_key(product_id):
@@ -157,6 +160,8 @@ class CustomerViewSet(ModelViewSet):
 class OrderViewSet(ModelViewSet):
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
+    pagination_class = DefaultPagination
+
     def get_permissions(self):
         if self.request.method in ["PATCH", "DELETE"]:
             return [IsAdminUser()]
@@ -168,11 +173,47 @@ class OrderViewSet(ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         order = serializer.save()
-        headers = self.get_success_headers(serializer.data)
-        serializer = OrderSerializer(order)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        line_items_list = []
+        for order_item in order.items.all():
+            product_images = [
+                f"http://localhost:8000/{order_item.product.images.first().image.url}"
+            ]
+            # Stripe Checkout is a fully hosted solution, once you redirect to the created Checkout session
+            # you're no longer working inside of your local development environment.
+            # To remedy this, should pass URLs for your product images that are hosted remotely that the Checkout session can access.
+            line_items_list.append(
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "unit_amount": int(order_item.product.unit_price) * 100,
+                        "product_data": {
+                            "name": order_item.product.title,
+                            "images": product_images,
+                        },
+                    },
+                    "quantity": order_item.quantity,
+                }
+            )
+        try:
+            checkout_session = stripe.checkout.Session.create(
+                line_items=line_items_list,
+                mode="payment",
+                success_url=settings.SITE_URL
+                + "?success=true",  # the frontend should send a patch request to edit the order payment status
+                cancel_url=settings.SITE_URL + "?canceled=true",
+            )
+            return redirect(checkout_session.url)
+        except Exception as e:
+            return Response(
+                {
+                    "msg": "something went wrong while creating stripe session",
+                    "error": str(e),
+                },
+                status=500,
+            )
 
     def get_queryset(self):
         user = self.request.user

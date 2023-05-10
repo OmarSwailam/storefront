@@ -4,6 +4,7 @@ message broker and a caching solution. The result is a powerful e-commerce backe
 any application or website.
 
 - Implemented user authentication with Djoser library and json web token (JWT).
+- Implemented payment gateway using stripe.
 - Designed shopping cart functionality and order placement.
 - Product search and filtering this allows users to quickly and easily find the products they're looking for.
 - Used Celery for asynchronous task processing such as sending confirmation emails and updating order status.

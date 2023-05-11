@@ -178,9 +178,10 @@ class OrderViewSet(ModelViewSet):
 
         line_items_list = []
         for order_item in order.items.all():
-            product_images = [
-                f"http://localhost:8000/{order_item.product.images.first().image.url}"
-            ]
+            if order_item.product.images > 0:
+                product_images = [
+                    f"http://localhost:8000/{order_item.product.images.first().image.url}"
+                ]
             # Stripe Checkout is a fully hosted solution, once you redirect to the created Checkout session
             # you're no longer working inside of your local development environment.
             # To remedy this, should pass URLs for your product images that are hosted remotely that the Checkout session can access.

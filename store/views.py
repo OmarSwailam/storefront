@@ -178,7 +178,7 @@ class OrderViewSet(ModelViewSet):
 
         line_items_list = []
         for order_item in order.items.all():
-            if order_item.product.images > 0:
+            if order_item.product.images.count() > 0:
                 product_images = [
                     f"http://localhost:8000/{order_item.product.images.first().image.url}"
                 ]

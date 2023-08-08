@@ -15,7 +15,8 @@ any application or website.
 - Used Locust to load test the API and optimize the performance.
 - Used Silk for a live profiling and inspection tool as it intercepts and stores HTTP requests and database queries
 
-
+## installation
+You can install it using Docker! visit the branch named "docker" and follow the installation steps
 ```
 
 # Clone repository

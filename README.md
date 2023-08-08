@@ -15,29 +15,16 @@ any application or website.
 - Used Locust to load test the API and optimize the performance.
 - Used Silk for a live profiling and inspection tool as it intercepts and stores HTTP requests and database queries
 
-
+## installation
 ```
 
 # Clone repository
   git clone https://github.com/OmarSwailam/storefront.git
 
-# Create a virtualenv(optional)
-  python3 -m venv env
+# make sure docker is installed on your machine
 
-
-# Install all dependencies
-  pip install -r requirements.txt
-
-
-# Activate the virtualenv
-  source venv/bin/activate or .venv/bin/activate
-
-# Run application
-  ./manage.py runserver or python manage.py runserver
-
-# Run celery
-  celery -A tasks worker --loglevel=INFO  -P threads
-
+# run the application
+  docker-compose up -d --build
 
 ```
 

@@ -31,6 +31,9 @@ You can install it using Docker! visit the branch named "docker" and follow the 
 # Install all dependencies
   pip install -r requirements.txt
 
+# migrate DB changes
+  python manage.py migrate
+
 # Run application
   python manage.py runserver
 

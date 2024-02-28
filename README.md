@@ -23,18 +23,16 @@ You can install it using Docker! visit the branch named "docker" and follow the 
   git clone https://github.com/OmarSwailam/storefront.git
 
 # Create a virtualenv(optional)
-  python3 -m venv env
+  python3 -m venv venv
 
+# Activate the virtualenv
+ venv/bin/activate or venv/scripts/activate
 
 # Install all dependencies
   pip install -r requirements.txt
 
-
-# Activate the virtualenv
-  source venv/bin/activate or .venv/bin/activate
-
 # Run application
-  ./manage.py runserver or python manage.py runserver
+  python manage.py runserver
 
 # Run celery
   celery -A tasks worker --loglevel=INFO  -P threads
